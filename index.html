@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Football Legacy</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#06101c;color:#eef5ff;font-family:Inter,Arial,sans-serif}button,input,select{font:inherit}
+.app{max-width:1100px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;align-items:center;padding:10px 0 18px}.logo{font-weight:900;font-size:24px}.logo span{color:#51e68a}.pill{background:#102238;border:1px solid #223b59;border-radius:999px;padding:8px 12px;color:#a9bbcf}
+.hero{text-align:center;padding:55px 15px 35px}.hero h1{font-size:clamp(42px,8vw,76px);line-height:.95;margin:0 0 18px;letter-spacing:-4px}.hero p{max-width:650px;margin:0 auto 26px;color:#9eb0c5;font-size:18px;line-height:1.55}
+.btn{padding:13px 18px;border-radius:12px;border:1px solid #294463;background:#102238;color:#fff;font-weight:800;cursor:pointer}.primary{background:#51e68a;color:#03120a;border-color:#51e68a}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:linear-gradient(145deg,#102238,#0a1727);border:1px solid #1d3551;border-radius:18px;padding:19px}.muted{color:#9eb0c5}.hidden{display:none!important}
+.steps{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 16px}.step{padding:7px 11px;border-radius:99px;border:1px solid #203a58;color:#7f94aa;font-size:13px}.step.on{background:#51e68a;color:#03120a;border-color:#51e68a}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:20px}.choice{text-align:left;padding:16px;border-radius:14px;background:#0c1b2d;color:white;border:1px solid #223b59;cursor:pointer}.choice:hover{border-color:#51e68a;transform:translateY(-1px)}
+input,select{width:100%;background:#091727;color:white;border:1px solid #294463;border-radius:11px;padding:13px;margin-top:7px}
+.dashboard{display:grid;grid-template-columns:230px 1fr;gap:15px}.side{height:max-content}.side button{width:100%;margin-bottom:8px;text-align:left}.side .active{border-color:#51e68a;background:#123322}.avatar{height:190px;border-radius:20px;background:radial-gradient(circle,#21496a,#0b192a);display:grid;place-items:center;font-size:76px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{padding:13px;border-radius:12px;background:#081524;border:1px solid #1b334e}.stat b{font-size:23px}.bar{height:7px;background:#1b334e;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:#51e68a}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #1b334e}.tag{font-size:12px;background:#123322;color:#70ee9d;border-radius:8px;padding:5px 8px}
+.notice{padding:13px;border-left:3px solid #51e68a;background:#0c1b2d;border-radius:8px;margin:10px 0}
+@media(max-width:700px){.dashboard{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body><main class="app">
+<header class="top"><div class="logo">Football <span>Legacy</span></div><div class="pill">⚽ Mode carrière</div></header>
+
+<section id="home">
+<div class="hero"><h1>Écris ta légende.</h1><p>Crée ton joueur, commence à 16 ans, progresse saison après saison, change de club et construis ton propre palmarès.</p><button class="btn primary" onclick="begin()">Créer ma carrière →</button></div>
+<div class="grid"><div class="card"><h3>🎮 Une carrière interactive</h3><p class="muted">Chaque décision peut modifier ta progression.</p></div><div class="card"><h3>📈 Progression</h3><p class="muted">Développe tes qualités et augmente ton GEN.</p></div><div class="card"><h3>🏆 Palmarès</h3><p class="muted">Accumule titres, buts, passes et distinctions.</p></div></div>
+</section>
+
+<section id="create" class="hidden"><div class="steps" id="steps"></div><div class="card"><h2 id="ctitle"></h2><p class="muted" id="cdesc"></p><div id="form"></div><div id="choices" class="choices"></div></div></section>
+
+<section id="game" class="hidden"><div class="dashboard"><aside class="side card">
+<div class="avatar">⚽</div><h2 id="sideName"></h2><p class="muted" id="sideInfo"></p>
+<button class="btn active" onclick="tab('profile',this)">👤 Profil</button><button class="btn" onclick="tab('season',this)">📅 Saison</button><button class="btn" onclick="tab('stats',this)">📊 Statistiques</button><button class="btn" onclick="tab('club',this)">🏟️ Club</button>
+</aside><section id="content" class="card"></section></div></section>
+</main>
+<script>
+const S={name:"",country:"",pos:"",style:"",club:"",age:16,season:2026,ovr:62,rep:40,goals:0,assists:0,apps:0,titles:0,history:[]};
+const steps=[["Ton nom","Comment veux-tu apparaître dans le jeu ?",null],["Nationalité","Choisis la sélection de ton joueur.",["🇫🇷 France","🇪🇸 Espagne","🇧🇷 Brésil","🇲🇦 Maroc","🏴 Angleterre","🇩🇪 Allemagne"]],["Poste","Choisis ton poste principal.",["BU","AG","AD","MOC","MC","MDC","DC","DD","DG","GB"]],["Style","Quel type de joueur veux-tu devenir ?",["Attaquant complet","Buteur","Dribbleur","Meneur de jeu","Défenseur complet","Gardien"]]];
+let n=0;
+function begin(){home.classList.add("hidden");create.classList.remove("hidden");drawCreate()}
+function drawCreate(){
+stepsEl();let q=steps[n];ctitle.textContent=q[0];cdesc.textContent=q[1];form.innerHTML="";choices.innerHTML="";
+if(n===0){form.innerHTML='<input id="nameInput" maxlength="20" placeholder="Ex : Rayan Diallo">';choices.innerHTML='<button class="choice" onclick="saveName()">Continuer →</button>';return}
+q[2].forEach(x=>choices.innerHTML+=`<button class="choice" onclick="pick(${JSON.stringify(x)})"><b>${x}</b><br><small class="muted">Sélectionner</small></button>`)
+}
+function stepsEl(){steps.innerHTML=steps.map((x,i)=>`<span class="step ${i===n?"on":""}">${i+1}. ${x[0]}</span>`).join("")}
+function saveName(){let v=document.getElementById("nameInput").value.trim();if(!v)return alert("Entre un nom.");S.name=v;n++;drawCreate()}
+function pick(x){if(n===1)S.country=x;if(n===2)S.pos=x;if(n===3){S.style=x;finish()}else{n++;drawCreate()}}
+function finish(){S.club=S.country.includes("France")?"Paris Élite":S.country.includes("Espagne")?"Madrid Élite":S.country.includes("Brésil")?"Rio Athletic":"Elite United";S.history.push(`16 ans — arrivée à ${S.club}`);create.classList.add("hidden");game.classList.remove("hidden");tab("profile")}
+function tab(which,el){document.querySelectorAll(".side .btn").forEach(b=>b.classList.remove("active"));if(el)el.classList.add("active");if(which==="profile")profile();if(which==="season")season();if(which==="stats")stats();if(which==="club")club()}
+function profile(){sideName.textContent=S.name;sideInfo.textContent=`${S.age} ans · ${S.pos} · ${S.club}`;content.innerHTML=`<h2>👤 Profil</h2><div class="grid"><div><div class="stat"><small>GEN</small><br><b>${S.ovr}</b></div></div><div><div class="stat"><small>RÉPUTATION</small><br><b>${S.rep}</b></div></div><div><div class="stat"><small>ÂGE</small><br><b>${S.age}</b></div></div></div><div class="notice">🇺🇳 ${S.country} · ${S.style}</div><h3>Palmarès</h3><p class="muted">${S.titles} titre(s) · ${S.goals} but(s) · ${S.assists} passe(s) décisive(s)</p>`}
+function season(){content.innerHTML=`<h2>📅 Saison ${S.season}/${String(S.season+1).slice(-2)}</h2><p class="muted">${S.club} · ${S.pos}</p><div class="notice">Ton prochain match approche. Fais évoluer ta carrière.</div><div class="grid"><div class="stat">Matchs<br><b>${S.apps}</b></div><div class="stat">Buts<br><b>${S.goals}</b></div><div class="stat">Passes<br><b>${S.assists}</b></div></div><br><button class="btn primary" onclick="play()">▶ Jouer la saison</button>`}
+function play(){let g=Math.floor(Math.random()*16),a=Math.floor(Math.random()*10);S.apps+=25+Math.floor(Math.random()*15);S.goals+=S.pos==="BU"?g+5:g;S.assists+=a;S.ovr=Math.min(99,S.ovr+2+Math.floor(Math.random()*4));S.rep=Math.min(100,S.rep+5+Math.floor(Math.random()*6));if(Math.random()>.65)S.titles++;S.age++;S.season++;S.history.unshift(`${S.age-1} ans — saison terminée : ${g} buts générés`);alert(`Saison terminée ! GEN ${S.ovr}`);season()}
+function stats(){let vals=[["Vitesse",76],["Technique",70],["Passe",68],["Finition",72],["Physique",65],["Mental",64]];content.innerHTML="<h2>📊 Statistiques</h2>"+vals.map(v=>`<div class="row"><span>${v[0]}</span><b>${v[1]}</b></div><div class="bar"><i style="width:${v[1]}%"></i></div>`).join("")}
+function club(){content.innerHTML=`<h2>🏟️ ${S.club}</h2><p class="muted">Ton club actuel</p><div class="row"><span>GEN équipe</span><b>78</b></div><div class="row"><span>Ton contrat</span><b>Jeune joueur</b></div><h3>Parcours</h3>${S.history.slice(0,8).map(x=>`<div class="row">${x}<span class="tag">Carrière</span></div>`).join("")}`}
+const home=document.getElementById("home"),create=document.getElementById("create"),game=document.getElementById("game"),steps=document.getElementById("steps"),ctitle=document.getElementById("ctitle"),cdesc=document.getElementById("cdesc"),form=document.getElementById("form"),choices=document.getElementById("choices"),content=document.getElementById("content"),sideName=document.getElementById("sideName"),sideInfo=document.getElementById("sideInfo");
+</script></body></html>
